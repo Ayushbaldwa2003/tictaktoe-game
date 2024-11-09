@@ -1,4 +1,6 @@
-const ws = new WebSocket('ws://localhost:3000');
+const wsUrl = window.location.hostname === "localhost" ? 'ws://localhost:3000' : 'wss://tictaktoe-game-yj0r.onrender.com';
+const ws = new WebSocket(wsUrl);
+
 const code = localStorage.getItem("gameCode");
 ws.addEventListener('open', () => {
   console.log("Connection opened");
