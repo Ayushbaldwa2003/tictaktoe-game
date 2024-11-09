@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Game</title>
+  <style>
+    /* Black theme for the page */
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    /* Centered container styling */
+    .container {
+      text-align: center;
+      max-width: 400px;
+      padding: 20px;
+      background-color: #1c1c1c;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    /* Title styling */
+    h2 {
+      margin-top: 0;
+      color: #fff;
+      font-size: 24px;
+    }
+
+    /* Input field styling */
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin: 15px 0;
+      background-color: #333;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 5px;
+    }
+
+    /* Button styling */
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #555;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    /* Button hover effect */
+    button:hover {
+      background-color: #777;
+    }
+
+    /* Game code display styling */
+    #gameCodeDisplay {
+      margin-top: 15px;
+      font-size: 18px;
+      color: #4caf50; /* Light green for better visibility */
+    }
+
+    /* Back to Home link styling */
+    a {
+      color: #4caf50;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 20px;
+      transition: color 0.3s;
+    }
+
+    a:hover {
+      color: #66bb6a;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Create Game</h2>
+    <input type="text" id="name" placeholder="Enter your name" required>
+    <button id="createGame">Create Game</button>
+    <p id="gameCodeDisplay" style="display: none;"></p>
+    <a href="index.html">Back to Home</a>
+  </div>
+
+  <script>
+    const ws = new WebSocket('ws://localhost:3000');
+    document.addEventListener('DOMContentLoaded', function () {
+      const createGameBtn = document.getElementById('createGame');
+      const nameInput = document.getElementById('name');
+
+      createGameBtn.addEventListener('click', () => {
+        const name = nameInput.value.trim();
+
+        if (!name) {
+          alert("Please enter your name");
+          return;
+        }
+
+        // Send create game request to server
+        ws.send(JSON.stringify({ type: 'createGame', name: name}));
+      });
+    });
+    ws.onmessage = (message) => {
+      const data = JSON.parse(message.data);
+      if (data.type === 'gameCode') {
+        // Store a value
+        localStorage.setItem("gameCode", data.code);
+        document.getElementById('gameCodeDisplay').textContent = `Your game code is: ${data.code}`;
+        document.getElementById('gameCodeDisplay').style.display = 'block';
+      }
+      if (data.type === 'gameStarted') {
+        window.location.href = 'game.html';
+      }
+    };
+  </script>
+</body>
+</html>

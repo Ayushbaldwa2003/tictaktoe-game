@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Menu</title>
+    <style>
+        /* Dark theme background and text */
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Container for buttons */
+        a {
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        /* Button styling */
+        button {
+            background-color: #1f1f1f;
+            color: #ffffff;
+            border: 2px solid #3a3a3a;
+            padding: 12px 24px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        /* Hover effects */
+        button:hover {
+            background-color: #333333;
+            transform: scale(1.05);
+        }
+
+        /* Focus effect */
+        button:focus {
+            outline: none;
+            border-color: #4e8cff;
+        }
+    </style>
+</head>
+<body>
+    <a href="multiplayer.html">
+        <button id="amultiplayer">Play Multiplayer</button>
+    </a>
+    <a href="playwithfriend.html">
+        <button id="aplaywithfriend">Play with Friends</button>
+    </a>
+</body>
+</html>

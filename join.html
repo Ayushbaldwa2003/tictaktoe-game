@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join Game</title>
+  <style>
+    /* Dark theme styling */
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    /* Centered container styling */
+    .container {
+      text-align: center;
+      max-width: 400px;
+      padding: 20px;
+      background-color: #1c1c1c;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    /* Title styling */
+    h2 {
+      margin-top: 0;
+      color: #fff;
+      font-size: 24px;
+    }
+
+    /* Input field styling */
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      background-color: #333;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 5px;
+    }
+
+    /* Button styling */
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #555;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    /* Button hover effect */
+    button:hover {
+      background-color: #777;
+    }
+
+    /* Back to Home link styling */
+    a {
+      color: #4caf50;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 20px;
+      transition: color 0.3s;
+    }
+
+    a:hover {
+      color: #66bb6a;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Join Game</h2>
+    <input type="text" id="name" placeholder="Enter your name" required>
+    <input type="text" id="gameCode" placeholder="Enter Game Code" required>
+    <button id="joinGame">Join Game</button>
+    <a href="index.html">Back to Home</a>
+  </div>
+
+  <script>
+    const ws = new WebSocket('ws://localhost:3000'); // WebSocket connection
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const joinGameBtn = document.getElementById('joinGame');
+      const nameInput = document.getElementById('name');
+      const gameCodeInput = document.getElementById('gameCode');
+
+      joinGameBtn.addEventListener('click', () => {
+        const name = nameInput.value.trim();
+        const gameCode = gameCodeInput.value.trim();
+
+        if (!name || !gameCode) {
+          alert("Please enter your name and game code");
+          return;
+        }
+
+        // Send join game request to server
+        ws.send(JSON.stringify({ type: 'joinGame', name: name, gameCode: gameCode }));
+      });
+    });
+
+    ws.onmessage = (message) => {
+      const data = JSON.parse(message.data);
+      if (data.type === 'gameStarted') {
+        window.location.href = 'game.html';
+      }
+    };
+  </script>
+</body>
+</html>
