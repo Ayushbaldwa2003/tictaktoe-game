@@ -1,18 +1,29 @@
 const http = require("http");
 const express = require("express");
 const WebSocketServer = require("websocket").server;
+const path = require("path");  // Import path to resolve static files
 
 const app = express();
 const server = http.createServer(app);
 const wsServer = new WebSocketServer({
   httpServer: server,
 });
+
 let connection2 = {};
 let games = {};
 let chance = "X";
 if (Math.floor(Math.random() * 2) == 1) {
-  chance = "Y";
+  chance = "O";
 }
+
+// Serve static files (like index.html, CSS, JS) directly from the root directory
+app.use(express.static(__dirname));
+
+// Serve the main page (index.html) for the root URL
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 wsServer.on("request", (request) => {
   //connect
   const connection = request.accept(null, request.origin);
@@ -75,38 +86,37 @@ wsServer.on("request", (request) => {
         connection2[data.code].symbols.push(symbol);
         break;
 
-        case "playing":
-          console.log('ji');
-            const gamee = connection2[data.code];
-            const playerSymbol = gamee.symbols[gamee.connections.indexOf(connection)]; // Get the symbol for this connection
-        
-            // Check if it's the correct player's turn
-            if (playerSymbol === chance) {
-                // Update the turn to the other player
-                chance = chance === "X" ? "O" : "X";
-        
-                // Broadcast the move to both players
-                gamee.connections.forEach((conn) => {
-                    conn.sendUTF(JSON.stringify({
-                        type: "moveMade",
-                        box: data.box,
-                        symbol: playerSymbol,
-                        nextTurn: chance
-                    }));
-                });
-            } else {
-                // Notify the player that it's not their turn
-                connection.sendUTF(JSON.stringify({
-                    type: "error",
-                    message: "It's not your turn"
-                }));
-            }
-            break;
-        
+      case "playing":
+        console.log('ji');
+        const gamee = connection2[data.code];
+        const playerSymbol = gamee.symbols[gamee.connections.indexOf(connection)]; // Get the symbol for this connection
+
+        // Check if it's the correct player's turn
+        if (playerSymbol === chance) {
+          // Update the turn to the other player
+          chance = chance === "X" ? "O" : "X";
+
+          // Broadcast the move to both players
+          gamee.connections.forEach((conn) => {
+            conn.sendUTF(JSON.stringify({
+              type: "moveMade",
+              box: data.box,
+              symbol: playerSymbol,
+              nextTurn: chance
+            }));
+          });
+        } else {
+          // Notify the player that it's not their turn
+          connection.sendUTF(JSON.stringify({
+            type: "error",
+            message: "It's not your turn"
+          }));
+        }
+        break;
     }
   });
 });
 
-server.listen(3000, () => {
+server.listen(process.env.PORT || 3000, () => {
   console.log("Server running on http://localhost:3000");
 });
