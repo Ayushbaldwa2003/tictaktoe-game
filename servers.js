@@ -44,6 +44,7 @@ wsServer.on("request", (request) => {
         break;
 
       case "joinGame":
+        console.log("hi")
         const game = games[data.gameCode];
         
         if (game && game.status === "waiting" && game.players.length < 2) {
