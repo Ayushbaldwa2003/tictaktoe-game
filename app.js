@@ -6,7 +6,6 @@ ws.addEventListener('open', () => {
   console.log("Connection opened");
   ws.send(JSON.stringify({ type: 'connection', code: code }));
 });
-
 let boxes = document.querySelectorAll(".box");
 let resetBtn = document.querySelector("#reset-btn");
 let newGameBtn = document.querySelector("#new-btn");
@@ -14,7 +13,7 @@ let msgContainer = document.querySelector(".msg-container");
 let msg = document.querySelector("#msg");
 
 let turnO = true; //playerX, playerO
-let count = 0; // To Track Draw
+let count = 0; //To Track Draw
 
 const winPatterns = [
   [0, 1, 2],
@@ -33,40 +32,75 @@ const resetGame = () => {
   enableBoxes();
   msgContainer.classList.add("hide");
 };
+// boxes.forEach((box) => {
+//   box.addEventListener("click", () => {
+//     ws.send(JSON.stringify({ type: 'playing', code: code ,box:box}));
+//     // if (turnO) {
+//     //   //playerO
+//     //   box.innerText = "O";
+//     //   turnO = false;
+//     // } else {
+//     //   //playerX
+//     //   box.innerText = "X";
+//     //   turnO = true;
+//     // }
+//     // box.disabled = true;
+//     // count++;
 
-// Box click handler: Send the box index to the server
+//     // let isWinner = checkWinner();
+
+//     // if (count === 9 && !isWinner) {
+//     //   gameDraw();
+//     // }
+//   });
+// });
+
+ws.addEventListener('open', () => {
+  console.log("Connection opened");
+  ws.send(JSON.stringify({ type: 'turn', code: code }));
+});
+// ws.onmessage = (message) => {
+//   const data = JSON.parse(message.data);
+
+//   if (data.type === "turn") {
+//     // Assuming 'turnIndicator' is the element that shows the turn message
+//     turnIndicator.innerText = "It's your turn"; // Display this when it's the player's turn
+//   }
+// };
+
 boxes.forEach((box, index) => {
   box.addEventListener("click", () => {
+    // Send the move to the server
     ws.send(JSON.stringify({ type: "playing", code: code, box: index }));
   });
 });
 
-// Handle incoming WebSocket messages
+// Handle incoming messages
 ws.onmessage = (message) => {
   const data = JSON.parse(message.data);
 
+  // Update the box when a move is made
   if (data.type === "moveMade") {
-    // Update the box when a move is made
+    console.log('hi');
     boxes[data.box].innerText = data.symbol;
     boxes[data.box].disabled = true; // Disable the box after a move
 
-    // Update turn indicator or display message
-    msg.innerText = `It's ${data.nextTurn}'s turn`;
+    // Optionally, update turn indicator or display message
+    // msg.innerText = It's ${data.nextTurn}'s turn;
     count++;
     checkWinner();
-    
-    // Check for a draw if all boxes are filled
-    if (count === 9) {
+    if(count==9){
       gameDraw();
     }
   } else if (data.type === "error") {
-    // Display error messages
     msg.innerText = data.message;
   }
 };
 
+
+
 const gameDraw = () => {
-  msg.innerText = `Game was a Draw.`;
+  msg.innerText = "Game was a Draw.";
   msgContainer.classList.remove("hide");
   disableBoxes();
 };
@@ -96,11 +130,13 @@ const checkWinner = () => {
     let pos2Val = boxes[pattern[1]].innerText;
     let pos3Val = boxes[pattern[2]].innerText;
 
-    if (pos1Val !== "" && pos1Val === pos2Val && pos2Val === pos3Val) {
-      showWinner(pos1Val);
-      return true;
+    if (pos1Val != "" && pos2Val != "" && pos3Val != "") {
+      if (pos1Val === pos2Val && pos2Val === pos3Val) {
+        showWinner(pos1Val);
+        return true;
+      }
     }
   }
 };
 
-newGameBtn.addEventListener("click", resetGame);
+newGameBtn.addEventListener("click", resetGame); 
